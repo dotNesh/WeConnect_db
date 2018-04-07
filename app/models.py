@@ -13,7 +13,7 @@ class Users(db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(10000), nullable=False)
-    businesses = db.relationship('Businesses', backref='owner',lazy='true')
+    businesses = db.relationship('Businesses', backref='owner',lazy=True)
     reviews = db.relationship('Reviews', backref='reviewer', lazy=True)
 
     def __init__(self, email, username, password):
@@ -21,7 +21,10 @@ class Users(db.Model):
         self.email = email
         self.username = username
         self.password = generate_password_hash(password)
-
+    def create_user(self):
+        '''creates a user'''
+        db.session.add(self)
+        db.session.commit()
 class Businesses(db.Model):
     '''Models for table businesses'''
 
@@ -33,7 +36,7 @@ class Businesses(db.Model):
     location = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    reviews = db.relationship('Reviews', backref='business', lazy='true')
+    reviews = db.relationship('Reviews', backref='business', lazy=True)
     posted_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
