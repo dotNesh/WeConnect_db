@@ -75,4 +75,22 @@ def login():
         'message':"Non-Existent User!"
         }
         return make_response(jsonify(response['message'])), 404
+
+@app.route('/api/v2/auth/reset-password', methods=['POST'])
+def reset():
+    '''Route to reset a password'''
+    data = request.get_json()
+    username = data.get('username')
+    new_password = data.get('new_password')
+    
+    existing_username = Users.query.filter_by(username= username).first()
+    if existing_username:
+        Users.reset_password(username, new_password)
+        return jsonify({'message':'Password Reset'}), 201
+
+    else:
+        response = {
+        'message':"Non-Existent User!"
+        }
+        return make_response(jsonify(response['message'])), 404         
         

@@ -75,6 +75,32 @@ class UserTestcase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg,"Non-Existent User!")
+    def test_password_reset(self):
+        responses = self.app().post("/api/v2/auth/reset-password",
+                        data=json.dumps(dict(username="nina",new_password="12364")),
+                                         content_type="application/json")
+        
+        self.assertEqual(responses.status_code, 201)
+        
+        response = self.app().post("/api/v2/auth/login",
+                        data=json.dumps(dict(username="nina",password="12364")),
+                                         content_type="application/json")
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Welcome nina. Log In Succesful!")
+        self.assertTrue(response_msg['token']) 
+    def test_password_reset_no_user(self):
+        response = self.app().post("/api/v2/auth/reset-password",
+                        data=json.dumps(dict(username="kiguru",new_password="12364")),
+                                         content_type="application/json")
+        
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg,"Non-Existent User!")                                  
+
+if __name__ == '__main__':
+    unittest.main()    
         
          
         

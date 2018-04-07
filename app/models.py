@@ -28,6 +28,12 @@ class Users(db.Model):
     def check_password(self, password):
         '''Check Password'''
         return check_password_hash(self.password,password)
+    @staticmethod
+    def reset_password(username, password):
+        '''Reset Password'''
+        person = Users.query.filter_by(username=username).first()
+        person.password = generate_password_hash(password)
+        person.create_user()    
 class Businesses(db.Model):
     '''Models for table businesses'''
 
