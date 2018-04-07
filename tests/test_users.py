@@ -97,7 +97,23 @@ class UserTestcase(unittest.TestCase):
         
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Non-Existent User!")                                  
+        self.assertEqual(response_msg,"Non-Existent User!")  
+    def test_logout_user(self):
+        login_user = self.app().post("/api/v2/auth/login",
+                        data=json.dumps(dict(username="nina",password="12345678")),
+                                         content_type="application/json")   
+
+        self.access_token = json.loads(login_user.data.decode())['token']
+
+        response = self.app().post("/api/v2/auth/logout",
+            headers = {
+                "Authorization": "Bearer {}".format(self.access_token),
+                "Content-Type": "application/json"
+                })
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['message'],"Logout successful") 
 
 if __name__ == '__main__':
     unittest.main()    

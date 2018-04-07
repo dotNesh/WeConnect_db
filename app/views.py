@@ -94,3 +94,11 @@ def reset():
         }
         return make_response(jsonify(response['message'])), 404         
         
+@app.route('/api/v2/auth/logout', methods=['POST'])
+@jwt_required
+def logout():
+    '''Route to logout a user'''
+    current_user = get_jwt_identity()
+    dump = get_raw_jwt()['jti']
+    blacklist.add(dump)
+    return jsonify({'message': 'Logout successful'}), 200
