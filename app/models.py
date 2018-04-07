@@ -14,6 +14,7 @@ class Users(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(10000), nullable=False)
     businesses = db.relationship('Businesses', backref='owner',lazy='true')
+    reviews = db.relationship('Reviews', backref='reviewer', lazy=True)
 
     def __init__(self, email, username, password):
         '''Initializes'''
@@ -32,6 +33,7 @@ class Businesses(db.Model):
     location = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reviews = db.relationship('Reviews', backref='business', lazy='true')
     posted_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -42,3 +44,22 @@ class Businesses(db.Model):
         self.location = location
         self.description = description
         self.owner_id = owner_id   
+
+class Reviews(db.Model):      
+    '''Models for table reviews'''
+
+    __tablename__ = 'reviews'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(20), nullable=False)
+    description = db.Column(db.String(250), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    business_id = db.Column(db.Integer, db.ForeignKey('businesses.id'))
+    posted_on = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(self, title, description,user_id,business_id):
+        '''Initializes'''
+        self.title = title
+        self.description = description  
+        self.user_id = user_id
+        self.business_id = business_id          
