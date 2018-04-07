@@ -56,6 +56,10 @@ class Businesses(db.Model):
         self.location = location
         self.description = description
         self.owner_id = owner_id
+    def register_business(self):
+        '''Register a Business'''
+        db.session.add(self)
+        db.session.commit()       
 
 class Reviews(db.Model):      
     '''Models for table reviews'''

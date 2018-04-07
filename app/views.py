@@ -103,3 +103,31 @@ def logout():
     blacklist.add(dump)
     return jsonify({'message': 'Logout successful'}), 200
 
+@app.route('/api/v2/businesses', methods=['POST'])
+@jwt_required
+def register_business():
+    '''Route to register a business'''
+    current_user = get_jwt_identity()
+    biz_data = request.get_json()
+
+    business_name = biz_data.get('business_name')
+    category = biz_data.get('category')
+    location = biz_data.get('location')
+    description = biz_data.get('description')
+
+    owner = Users.query.filter_by(id=current_user).first()
+    owner_id = owner.id
+    existing_business = Businesses.query.filter_by(business_name= business_name).first()
+    if existing_business:
+        response = {
+        'message':"Business Name Taken!"
+        }
+        return make_response(jsonify(response['message'])), 409
+
+    else:
+        new_biz = Businesses(business_name, category, location, description, owner_id)
+        new_biz.register_business()
+        response = {
+            'message': new_biz.business_name + '. Business successfully registered'
+            }
+        return make_response(jsonify(response['message'])), 201    
