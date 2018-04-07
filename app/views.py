@@ -102,3 +102,4 @@ def logout():
     dump = get_raw_jwt()['jti']
     blacklist.add(dump)
     return jsonify({'message': 'Logout successful'}), 200
+

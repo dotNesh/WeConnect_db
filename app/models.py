@@ -55,7 +55,7 @@ class Businesses(db.Model):
         self.category = category
         self.location = location
         self.description = description
-        self.owner_id = owner_id   
+        self.owner_id = owner_id
 
 class Reviews(db.Model):      
     '''Models for table reviews'''
