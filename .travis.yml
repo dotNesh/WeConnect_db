@@ -10,6 +10,6 @@ before_script:
   - psql -c "CREATE USER weconnect WITH PASSWORD 'weconnect';" -U postgres
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE weconnect_test TO weconnect;" -U postgres  
 script:
-  - nosetests --with-coverage --cover-package=app
+  - nosetests --with-coverage
 after_success:
   - coveralls
