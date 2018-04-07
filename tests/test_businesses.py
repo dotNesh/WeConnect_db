@@ -10,7 +10,7 @@ class BusinessTestcase(unittest.TestCase):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['DEBUG'] = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres17!@localhost/testwetest'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres17!@localhost/weconnect_test'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
         self.app = app.test_client 
         db.init_app(app)
