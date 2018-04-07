@@ -26,7 +26,7 @@ class UserTestcase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 201)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Account successfully registered. Log In to access.")  
+        self.assertEqual(response_msg,"Account successfully registered. Log In to access.")      
 class UserMananipulationTestcase(unittest.TestCase):       
     def setUp(self):
         app.config['TESTING'] = True
@@ -54,5 +54,14 @@ class UserMananipulationTestcase(unittest.TestCase):
         self.assertEqual(response.status_code, 409)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg,"Email Already Exists!")
+    def test_login(self):
+        response = self.app().post("/api/v2/auth/login",
+                        data=json.dumps(dict(username="nina",password="12345678")),
+                                         content_type="application/json")
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Welcome nina. Log In Succesful!")
+        self.assertTrue(response_msg['token'])    
          
         

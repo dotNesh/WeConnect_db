@@ -25,6 +25,9 @@ class Users(db.Model):
         '''creates a user'''
         db.session.add(self)
         db.session.commit()
+    def check_password(self, password):
+        '''Check Password'''
+        return check_password_hash(self.password,password)
 class Businesses(db.Model):
     '''Models for table businesses'''
 
