@@ -82,6 +82,7 @@ class BusinessTestcase(unittest.TestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg,"Business Name Taken!") 
     def test_get_businesses(self):
+        '''test get all businesses'''
         response = self.app().get("/api/v2/businesses",
                                     headers = {
                                     "Content-Type": "application/json"

@@ -134,7 +134,7 @@ def register_business():
 
 @app.route('/api/v2/businesses', methods=['GET'])
 def get_business():
-    '''Route to get all businesses'''
+    '''Route to get all the businesses'''
     businesses = Businesses.get_all()
     results = {}
     if len(businesses) > 0:

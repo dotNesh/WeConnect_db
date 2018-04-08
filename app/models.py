@@ -62,7 +62,7 @@ class Businesses(db.Model):
         db.session.commit()
     @staticmethod
     def get_all():
-        '''Get all businesses'''
+        '''Get all the businesses'''
         return Businesses.query.all()          
 
 class Reviews(db.Model):      
