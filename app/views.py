@@ -128,6 +128,29 @@ def register_business():
         new_biz = Businesses(business_name, category, location, description, owner_id)
         new_biz.register_business()
         response = {
-            'message': new_biz.business_name + '. Business successfully registered'
+            'message': new_biz.business_name + '. Business successfully registered by ' + new_biz.owner.username
             }
-        return make_response(jsonify(response['message'])), 201    
+        return make_response(jsonify(response['message'])), 201  
+
+@app.route('/api/v2/businesses', methods=['GET'])
+def get_business():
+    '''Route to get all businesses'''
+    businesses = Businesses.get_all()
+    results = {}
+    if len(businesses) > 0:
+        for business in businesses:
+            obj = {business.id:{
+                'Business name':business.business_name,
+                'Category':business.category,
+                'Location':business.location,
+                'Created By': business.owner.username,
+                'Description':business.description,
+                'Created on':business.posted_on
+                }
+            }
+            
+            results.update(obj)         
+        return make_response(jsonify(results)), 200
+    else:
+        return jsonify({'message': 'No businesses yet'}), 404
+

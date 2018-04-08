@@ -59,7 +59,11 @@ class Businesses(db.Model):
     def register_business(self):
         '''Register a Business'''
         db.session.add(self)
-        db.session.commit()       
+        db.session.commit()
+    @staticmethod
+    def get_all():
+        '''Get all businesses'''
+        return Businesses.query.all()          
 
 class Reviews(db.Model):      
     '''Models for table reviews'''

@@ -55,7 +55,7 @@ class BusinessTestcase(unittest.TestCase):
                                 })
         self.assertEqual(response.status_code, 201)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Mutura. Business successfully registered")
+        self.assertEqual(response_msg,"Mutura. Business successfully registered by nina")
 
     def test_add_unauthorized_if_no_token_passed(self):
         
@@ -80,4 +80,10 @@ class BusinessTestcase(unittest.TestCase):
                                 })
         self.assertEqual(response.status_code, 409)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Business Name Taken!")   
+        self.assertEqual(response_msg,"Business Name Taken!") 
+    def test_get_businesses(self):
+        response = self.app().get("/api/v2/businesses",
+                                    headers = {
+                                    "Content-Type": "application/json"
+                                    })
+        self.assertEqual(response.status_code, 200)      
