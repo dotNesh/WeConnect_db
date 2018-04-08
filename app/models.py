@@ -67,7 +67,19 @@ class Businesses(db.Model):
     @staticmethod
     def get_one(business_id):  
         business = Businesses.query.filter_by(id=business_id).first()  
-        return business   
+        return business
+    @staticmethod
+    def update_business(business_id,data):
+        business = Businesses.query.filter_by(id=business_id).first()
+
+        if 'category' in data.keys():
+            business.category = data['category']
+        if 'location' in data.keys():
+            business.location = data['location'] 
+        if 'description' in data.keys():
+            business.description = data['description'] 
+
+        business.register_business()    
 
 class Reviews(db.Model):      
     '''Models for table reviews'''

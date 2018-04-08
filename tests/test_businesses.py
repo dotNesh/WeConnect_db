@@ -17,7 +17,7 @@ class BusinessTestcase(unittest.TestCase):
         with app.app_context():
             db.drop_all()
             db.create_all()  
-
+        '''User 1'''
         self.app().post("/api/v2/auth/register",
                     data=json.dumps(dict(email="nina@live",username="nina",
                                 password="12345678")), content_type="application/json") 
@@ -26,7 +26,18 @@ class BusinessTestcase(unittest.TestCase):
                         data=json.dumps(dict(username="nina",password="12345678")),
                                          content_type="application/json") 
       
-        self.access_token = json.loads(self.login_user.data.decode())['token']                                       
+        self.access_token = json.loads(self.login_user.data.decode())['token']  
+
+        '''User 2'''
+        self.app().post("/api/v2/auth/register",
+                    data=json.dumps(dict(email="ron@live",username="ron",
+                                password="12345678")), content_type="application/json") 
+
+        self.login_user2 = self.app().post("/api/v2/auth/login",
+                        data=json.dumps(dict(username="ron",password="12345678")),
+                                         content_type="application/json") 
+      
+        self.access_token2 = json.loads(self.login_user2.data.decode())['token']                                     
         
         self.app().post("/api/v2/businesses",
                                 data=json.dumps(dict(
@@ -104,4 +115,47 @@ class BusinessTestcase(unittest.TestCase):
                                     })
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Resource Not Found")                 
+        self.assertEqual(response_msg["message"],"Resource Not Found")
+    def test_business_update(self):
+        response = self.app().put("/api/v2/businesses/1",
+                                data=json.dumps(dict(
+                                    category="software development",
+                                    location="Kampala",
+                                    description="TIA")
+                                ),
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token),
+                                    "Content-Type": "application/json"
+                                })
+        self.assertEqual(response.status_code, 201)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Successfully Updated")
+    def test_business_update_not_owner(self):
+        response = self.app().put("/api/v2/businesses/1",
+                                data=json.dumps(dict(
+                                    category="software development",
+                                    location="Kampala",
+                                    description="TIA")
+                                ),
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token2),
+                                    "Content-Type": "application/json"
+                                })
+        self.assertEqual(response.status_code, 401)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"You cannot update a business that is not yours")
+
+    def test_business_update_not_found(self):
+        response = self.app().put("/api/v2/businesses/11",
+                                data=json.dumps(dict(
+                                    category="software development",
+                                    location="Kampala",
+                                    description="TIA")
+                                ),
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token),
+                                    "Content-Type": "application/json"
+                                })
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Cannot Update. Resource(Business) Not Found")                            
