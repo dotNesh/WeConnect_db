@@ -1,0 +1,1 @@
+[![Coverage Status](https://coveralls.io/repos/github/kmunene/WeConnect_db/badge.png?branch=businesses)](https://coveralls.io/github/kmunene/WeConnect_db?branch=businesses)
