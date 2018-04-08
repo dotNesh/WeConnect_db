@@ -187,5 +187,16 @@ def one_biz(business_id):
                 return jsonify({'message':'You cannot update a business that is not yours'}), 401    
 
         else:
-            return jsonify({'message':'Cannot Update. Resource(Business) Not Found'}), 404                 
+            return jsonify({'message':'Cannot Update. Resource(Business) Not Found'}), 404 
+
+    if request.method == 'DELETE':
+        if business:
+            if current_user == business.owner_id:
+                Businesses.delete_business(business_id)
+                return jsonify({'message':'Successfully Deleted'}), 201
+            else:
+                return jsonify({'message':'You cannot delete a business that is not yours'}), 401    
+
+        else:
+            return jsonify({'message':'Cannot Delete. Resource(Business) Not Found'}), 404                    
 

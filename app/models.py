@@ -65,11 +65,13 @@ class Businesses(db.Model):
         '''Get all the businesses'''
         return Businesses.query.all()
     @staticmethod
-    def get_one(business_id):  
+    def get_one(business_id):
+        '''Get a specific business'''  
         business = Businesses.query.filter_by(id=business_id).first()  
         return business
     @staticmethod
     def update_business(business_id,data):
+        '''Update a business'''
         business = Businesses.query.filter_by(id=business_id).first()
 
         if 'category' in data.keys():
@@ -79,7 +81,15 @@ class Businesses(db.Model):
         if 'description' in data.keys():
             business.description = data['description'] 
 
-        business.register_business()    
+        business.register_business()
+
+    @staticmethod
+    def delete_business(business_id):
+        '''Delete a Business'''
+        business = Businesses.query.filter_by(id=business_id).first()
+        if business:
+            db.session.delete(business)
+            db.session.commit()        
 
 class Reviews(db.Model):      
     '''Models for table reviews'''

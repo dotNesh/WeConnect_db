@@ -99,6 +99,20 @@ class BusinessTestcase(unittest.TestCase):
                                     "Content-Type": "application/json"
                                     })
         self.assertEqual(response.status_code, 200)
+    def test_get_businesses_if_none(self):
+        '''test get all businesses'''
+        self.app().delete("/api/v2/businesses/1",
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token),
+                                    "Content-Type": "application/json"
+                                })
+        response = self.app().get("/api/v2/businesses",
+                                    headers = {
+                                    "Content-Type": "application/json"
+                                    })
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['message'],"No businesses yet")     
     def test_get_one_business(self):
         response = self.app().get("/api/v2/businesses/1",
                                     headers = {
@@ -108,7 +122,7 @@ class BusinessTestcase(unittest.TestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg['1']['Business name'],"Andela") 
 
-    def test_business_not_found(self): 
+    def test_business_not_found(self):
         response = self.app().get("/api/v2/businesses/11",
                                     headers = {
                                     "Content-Type": "application/json"
@@ -158,4 +172,33 @@ class BusinessTestcase(unittest.TestCase):
                                 })
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Cannot Update. Resource(Business) Not Found")                            
+        self.assertEqual(response_msg["message"],"Cannot Update. Resource(Business) Not Found")
+    def test_business_delete(self):
+        response = self.app().delete("/api/v2/businesses/1",
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token),
+                                    "Content-Type": "application/json"
+                                })  
+        
+        self.assertEqual(response.status_code, 201)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Successfully Deleted")
+    def test_business_delete_not_owner(self):
+        response = self.app().delete("/api/v2/businesses/1",
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token2),
+                                    "Content-Type": "application/json"
+                                })  
+        self.assertEqual(response.status_code, 401)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"You cannot delete a business that is not yours")
+    def test_business_delete_not_found(self):
+        response = self.app().delete("/api/v2/businesses/11",
+                                headers = {
+                                    "Authorization": "Bearer {}".format(self.access_token),
+                                    "Content-Type": "application/json"
+                                })  
+        
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Cannot Delete. Resource(Business) Not Found")                                      
