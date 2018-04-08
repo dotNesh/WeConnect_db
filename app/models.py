@@ -63,7 +63,11 @@ class Businesses(db.Model):
     @staticmethod
     def get_all():
         '''Get all the businesses'''
-        return Businesses.query.all()          
+        return Businesses.query.all()
+    @staticmethod
+    def get_one(business_id):  
+        business = Businesses.query.filter_by(id=business_id).first()  
+        return business   
 
 class Reviews(db.Model):      
     '''Models for table reviews'''

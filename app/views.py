@@ -154,3 +154,19 @@ def get_business():
     else:
         return jsonify({'message': 'No businesses yet'}), 404
 
+@app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   
+def get_a_business(business_id):
+        business = Businesses.get_one(business_id)
+        if business:
+            results = {business.id:{
+                'Business name':business.business_name,
+                'Category':business.category,
+                'Location':business.location,
+                'Created By': business.owner.username,
+                'Description':business.description
+                }
+            }       
+            return make_response(jsonify(results)), 200
+        else:
+            return jsonify({'message':'Resource Not Found'}), 404         
+

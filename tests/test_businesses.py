@@ -87,4 +87,21 @@ class BusinessTestcase(unittest.TestCase):
                                     headers = {
                                     "Content-Type": "application/json"
                                     })
-        self.assertEqual(response.status_code, 200)      
+        self.assertEqual(response.status_code, 200)
+    def test_get_one_business(self):
+        response = self.app().get("/api/v2/businesses/1",
+                                    headers = {
+                                    "Content-Type": "application/json"
+                                    })
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['1']['Business name'],"Andela") 
+
+    def test_business_not_found(self): 
+        response = self.app().get("/api/v2/businesses/11",
+                                    headers = {
+                                    "Content-Type": "application/json"
+                                    })
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Resource Not Found")                 
