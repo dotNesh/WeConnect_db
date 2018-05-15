@@ -185,33 +185,35 @@ def get_a_business(business_id):
         else:
             return jsonify({'message':'Resource Not Found'}), 404
 
-@app.route('/api/v2/businesses/<int:business_id>', methods=['PUT','DELETE'])
+@app.route('/api/v2/businesses/<int:business_id>', methods=['PUT'])
 @jwt_required
-def one_biz(business_id):
+def update_business(business_id):
     '''Route to update and delete a business'''
     current_user = get_jwt_identity()
     business = Businesses.get_one(business_id)
-
-    if request.method == 'PUT':
-        if business:
-            if current_user == business.owner_id:
-                data = request.get_json()
-                Businesses.update_business(business_id, data)
-                return jsonify({'message':'Successfully Updated'}), 201
-            else:
-                return jsonify({'message':'You cannot update a business that is not yours'}), 401    
-
+    if business:
+        if current_user == business.owner_id:
+            data = request.get_json()
+            Businesses.update_business(business_id, data)
+            return jsonify({'message':'Successfully Updated'}), 201
         else:
-            return jsonify({'message':'Cannot Update. Resource(Business) Not Found'}), 404 
+            return jsonify({'message':'You cannot update a business that is not yours'}), 401    
 
-    if request.method == 'DELETE':
-        if business:
-            if current_user == business.owner_id:
-                Businesses.delete_business(business_id)
-                return jsonify({'message':'Successfully Deleted'}), 201
-            else:
-                return jsonify({'message':'You cannot delete a business that is not yours'}), 401    
+    else:
+        return jsonify({'message':'Cannot Update. Resource(Business) Not Found'}), 404 
 
+@app.route('/api/v2/businesses/<int:business_id>', methods=['DELETE'])
+@jwt_required
+def delete_business(business_id):
+    current_user = get_jwt_identity()
+    business = Businesses.get_one(business_id)
+    if business:
+        if current_user == business.owner_id:
+            Businesses.delete_business(business_id)
+            return jsonify({'message':'Successfully Deleted'}), 201
         else:
-            return jsonify({'message':'Cannot Delete. Resource(Business) Not Found'}), 404                    
+            return jsonify({'message':'You cannot delete a business that is not yours'}), 401    
+
+    else:
+        return jsonify({'message':'Cannot Delete. Resource(Business) Not Found'}), 404                    
 
