@@ -136,6 +136,20 @@ def register_business():
 def get_business():
     '''Route to get all the businesses'''
     businesses = Businesses.get_all()
+    if len(businesses) > 0:
+        obj= [business.serialize() for business in businesses]   
+        return make_response(jsonify(obj)), 200
+    else:
+        return jsonify({'message': 'No businesses yet'}), 404
+
+@app.route('/api/v2/businesses/search', methods=['GET'])
+def search():
+    '''Route to search and filter businesses'''
+    data_name = request.args.get('name',type=str)
+    data_category = request.args.get('category',type=str)
+    data_location = request.args.get('location',type=str)
+
+    businesses = Businesses.search(data_name, data_category, data_location)
     results = {}
     if len(businesses) > 0:
         for business in businesses:
@@ -152,7 +166,8 @@ def get_business():
             results.update(obj)         
         return make_response(jsonify(results)), 200
     else:
-        return jsonify({'message': 'No businesses yet'}), 404
+        return jsonify({'message': 'No Match found'}), 404
+
 
 @app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   
 def get_a_business(business_id):
