@@ -2,7 +2,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/kmunene/WeConnect_db/badge.svg?branch=reviews)](https://coveralls.io/github/kmunene/WeConnect_db?branch=reviews)
 [![Build Status](https://travis-ci.org/kmunene/WeConnect_db.svg?branch=reviews)](https://travis-ci.org/kmunene/WeConnect_db)
 
-A Flask API with Endpoints that enable users to:
+# WeConnect
+
+This is an API for WeConnect, a platform that brings businesses and individuals together. This platform creates awareness for businesses and gives the users the ability to:
 
 - Register an account and Login into it.
 - Register, Update and delete a Business .
@@ -47,7 +49,7 @@ Create a .env file in your root directory and activate it
 source .env
 ```
 ## Database migration
-Create a two Databases:
+Create two Databases:
 - weconnect (production DB)
 - weconnect_db (testing DB)
 
