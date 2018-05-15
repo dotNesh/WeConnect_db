@@ -56,6 +56,16 @@ class Businesses(db.Model):
         self.location = location
         self.description = description
         self.owner_id = owner_id
+
+    def serialize(self):
+        return {self.id:{
+                'business_name': self.business_name,
+                'category': self.category,
+                'location': self.location,
+                'description': self.description
+                }
+        }
+
     def register_business(self):
         '''Register a Business'''
         db.session.add(self)
@@ -64,11 +74,27 @@ class Businesses(db.Model):
     def get_all():
         '''Get all the businesses'''
         return Businesses.query.all()
+    
+    @staticmethod
+    def search(data_name, category, location):
+        '''Search'''
+        subquery = Businesses.query
+        if data_name is not None:
+            bizname = "%"+data_name+"%"
+            subquery = subquery.filter(Businesses.business_name.ilike(bizname))
+        if category is not None:
+            subquery = subquery.filter_by(category=category)
+        if location is not None:
+            subquery = subquery.filter_by(location=location)
+
+        return subquery.all()
+
     @staticmethod
     def get_one(business_id):
-        '''Get a specific business'''  
-        business = Businesses.query.filter_by(id=business_id).first()  
+        '''Get a specific business'''
+        business = Businesses.query.filter_by(id=business_id).first()
         return business
+        
     @staticmethod
     def update_business(business_id,data):
         '''Update a business'''
@@ -108,4 +134,16 @@ class Reviews(db.Model):
         self.title = title
         self.description = description  
         self.user_id = user_id
-        self.business_id = business_id          
+        self.business_id = business_id  
+
+    def add_review(self):
+        '''Add a review'''
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_reviews(business_id):
+        '''Get all Reviews'''
+        bizreviews = Reviews.query.filter_by(business_id=business_id).all()
+        return bizreviews
+           
