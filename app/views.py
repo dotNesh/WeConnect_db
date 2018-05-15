@@ -229,7 +229,6 @@ def reviews(business_id):
             description = review_data.get('description') 
             user_id = business.owner_id
             business_id = business.id
-
             new_review = Reviews(title, description,user_id,business_id)
             new_review.add_review()
         
@@ -246,19 +245,10 @@ def reviews(business_id):
 def get_reviews(business_id): 
     business = Businesses.get_one(business_id)
     if business:    
-        allreviews = Reviews.get_reviews(business_id) 
-        results = {}
-        for allreview in allreviews:
-            obj = {allreview.id:{  
-            'Business name':business.business_name,      
-            'title':allreview.title,
-            'Description':allreview.description,   
-            'Reviewed by':allreview.reviewer.username   
-                }
-            }
-            results.update(obj)      
-        if len(results) > 0:
-            return make_response(jsonify(results)), 200
+        allreviews = Reviews.get_reviews(business_id)
+        obj= [allreview.serialize() for allreview in allreviews]      
+        if len(obj) > 0:
+            return make_response(jsonify(obj)), 200
         else:
             return jsonify({'message':'No reviews yet.Please review business'}), 404
     else: 

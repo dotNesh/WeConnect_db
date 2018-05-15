@@ -134,7 +134,16 @@ class Reviews(db.Model):
         self.title = title
         self.description = description  
         self.user_id = user_id
-        self.business_id = business_id  
+        self.business_id = business_id
+
+    def serialize(self):
+        return {self.id:{
+                'title': self.title,
+                'description': self.description,
+                'Reviewer':self.reviewer.username,
+                'Business':self.business.business_name
+                }
+        } 
 
     def add_review(self):
         '''Add a review'''
