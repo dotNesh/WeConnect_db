@@ -215,5 +215,54 @@ def delete_business(business_id):
             return jsonify({'message':'You cannot delete a business that is not yours'}), 401    
 
     else:
-        return jsonify({'message':'Cannot Delete. Resource(Business) Not Found'}), 404                    
+        return jsonify({'message':'Cannot Delete. Resource(Business) Not Found'}), 404 
+
+@app.route('/api/v2/businesses/<int:business_id>/reviews', methods=['POST'])   
+@jwt_required
+def reviews(business_id):
+    current_user = get_jwt_identity()
+    business = Businesses.get_one(business_id)
+    if business:
+        if current_user != business.owner_id:
+            review_data = request.get_json()
+            title = review_data.get('title')
+            description = review_data.get('description') 
+            user_id = business.owner_id
+            business_id = business.id
+
+            new_review = Reviews(title, description,user_id,business_id)
+            new_review.add_review()
+        
+            response = {
+                        'message': 'Review Posted',
+                        }
+            return make_response(jsonify(response)), 201
+        else:
+            return jsonify({'message':'Cannot Review your own Business'}), 401   
+    else:
+        return jsonify({'message':'Cannot Review. Resource(Business) Not Found'}), 404 
+
+@app.route('/api/v2/businesses/<int:business_id>/reviews', methods=['GET'])  
+def get_reviews(business_id): 
+    business = Businesses.get_one(business_id)
+    if business:    
+        allreviews = Reviews.get_reviews(business_id) 
+        results = {}
+        for allreview in allreviews:
+            obj = {allreview.id:{  
+            'Business name':business.business_name,      
+            'title':allreview.title,
+            'Description':allreview.description,   
+            'Reviewed by':allreview.reviewer.username   
+                }
+            }
+            results.update(obj)      
+        if len(results) > 0:
+            return make_response(jsonify(results)), 200
+        else:
+            return jsonify({'message':'No reviews yet.Please review business'}), 404
+    else: 
+        return jsonify({'message':'Resource(Business) Not Found'}), 404      
+
+
 
