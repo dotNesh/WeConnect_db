@@ -17,8 +17,8 @@ This is an API for WeConnect, a platform that brings businesses and individuals 
 
 ## Prerequisites
 
-Python 3.6 or a later version
-PostgresSQL
+- Python 3.6 or a later version
+- PostgresSQL
 
 ## Installation
 Clone the repo.
