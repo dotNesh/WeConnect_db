@@ -1,9 +1,22 @@
 '''Contains API Routes'''
+import uuid
 from flask import Flask, jsonify, request, make_response
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_raw_jwt
 from app.models import Users, Businesses, Reviews
+from app import validate
 from werkzeug.security import check_password_hash
+from flask_mail import Mail, Message 
 from app import app
+
+#Mail configurations
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'hcravens25@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ravens2018'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'hcravens25@gmail.com'
+mail = Mail(app)
 
 # Setup the Flask-JWT-Extended extension
 app.config['JWT_SECRET_KEY'] = 'super-secret'
@@ -25,19 +38,17 @@ def register_user():
     email = user_data.get('email')
     username = user_data.get('username')
     password = user_data.get('password')
+    data = {"username":username,"email":email,"password":password}
 
-    existing_username = Users.query.filter_by(username=username).first()
-    existing_email = Users.query.filter_by(email=email).first()
-    if existing_username:
-        response = {
-            'message':"Username Taken!"
-        }
-        return make_response(jsonify(response['message'])), 409
-    elif existing_email:
-        response = {
-            'message':"Email Already Exists!"
-        }
-        return make_response(jsonify(response['message'])), 409
+    if validate.inputs(data):
+        return jsonify(validate.inputs(data)), 406
+    
+    if validate.pattern(data):
+        return jsonify(validate.pattern(data)), 406
+
+    if validate.existing(data):
+        return jsonify(validate.existing(data)), 409
+
     else:
         new_user = Users(email, username, password)
         new_user.create_user()
@@ -51,7 +62,11 @@ def login():
     '''Route to login a User'''
     login_data = request.get_json()
     username = login_data.get('username')
-    password = login_data.get('password')    
+    password = login_data.get('password')
+    
+    data = {"username":username, "password":password}
+    if validate.inputs(data):
+        return jsonify(validate.inputs(data)), 406
     
     existing_user = Users.query.filter_by(username= username).first()
     if existing_user:
@@ -82,8 +97,8 @@ def reset():
     data = request.get_json()
     username = data.get('username')
     new_password = data.get('new_password')
-    
-    existing_username = Users.query.filter_by(username= username).first()
+
+    existing_username = Users.query.filter_by(username=username).first()
     if existing_username:
         Users.reset_password(username, new_password)
         return jsonify({'message':'Password Reset'}), 201
@@ -92,7 +107,30 @@ def reset():
         response = {
         'message':"Non-Existent User!"
         }
-        return make_response(jsonify(response['message'])), 404         
+        return make_response(jsonify(response['message'])), 404
+
+@app.route('/api/v2/auth/change-password', methods=['POST'])
+def change():
+    '''Route to change a password'''
+    data = request.get_json()
+    username = data.get('username')
+
+    existing_username = Users.query.filter_by(username= username).first()
+    if existing_username:
+        print("ex",existing_username)
+        password = str(uuid.uuid4())[:8]
+        Users.reset_password(username, password)
+        message = Message(
+                    subject="Password Reset",
+                    sender='hcravens25@gmail.com',
+                    recipients=[existing_username.email],
+                    body="Hello" + existing_username.username + ",\n Your new password is:" + password
+                    )
+        mail.send(message)
+        return jsonify({'message': 'An email has been sent with your new password!'}), 200
+
+    return jsonify({'message': 'Non-existent user. Try signing up'}), 404
+
         
 @app.route('/api/v2/auth/logout', methods=['POST'])
 @jwt_required
@@ -114,6 +152,11 @@ def register_business():
     category = biz_data.get('category')
     location = biz_data.get('location')
     description = biz_data.get('description')
+    
+    data = {"business_name":business_name, "category":category, "location":location, "description":description}
+
+    if validate.inputs(data):
+        return jsonify(validate.inputs(data)), 406
 
     owner = Users.query.filter_by(id=current_user).first()
     owner_id = owner.id

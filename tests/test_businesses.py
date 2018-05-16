@@ -19,7 +19,7 @@ class BusinessTestcase(unittest.TestCase):
             db.create_all()  
         '''User 1'''
         self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nina@live",username="nina",
+                    data=json.dumps(dict(email="nina@live.com",username="nina",
                                 password="12345678")), content_type="application/json") 
 
         self.login_user = self.app().post("/api/v2/auth/login",
@@ -30,11 +30,11 @@ class BusinessTestcase(unittest.TestCase):
 
         '''User 2'''
         self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="ron@live",username="ron",
+                    data=json.dumps(dict(email="ron@live.com",username="ronn",
                                 password="12345678")), content_type="application/json") 
 
         self.login_user2 = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="ron",password="12345678")),
+                        data=json.dumps(dict(username="ronn",password="12345678")),
                                          content_type="application/json") 
       
         self.access_token2 = json.loads(self.login_user2.data.decode())['token']                                     
@@ -67,6 +67,123 @@ class BusinessTestcase(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg,"Mutura. Business successfully registered by nina")
+    
+    def test_business_name_empty(self):
+        '''Test for blank business name'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="", category="software",
+                                                      location="Nairobi",
+                                                      description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['business_name-Error:']["message"], "business_name cannot be an empty string")
+
+    def test_category_empty(self):
+        '''Test for blank category'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela", category="",
+                                                      location="Nairobi",
+                                                      description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['category-Error:']["message"], "category cannot be an empty string")
+
+    def test_location_empty(self):
+        '''Test for blank location'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela", category="software",
+                                                      location="", description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['location-Error:']["message"], "location cannot be an empty string")
+
+    def test_description_empty(self):
+        '''Test for blank description'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela", category="software",
+                                                      location="Nairobi", description="")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['description-Error:']["message"], "description cannot be an empty string")
+
+    def test_business_name_none(self):
+        '''Test for business name none'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(category="software",
+                                                      location="Nairobi",
+                                                      description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['business_name-Error:']["message"], "business_name cannot be missing")
+
+    def test_category_none(self):
+        '''Test for category none'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela",
+                                                      location="Nairobi",
+                                                      description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['category-Error:']["message"], "category cannot be missing")
+
+    def test_location_none(self):
+        '''Test for location none'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela", category="software",
+                                                     description="This is Andela")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['location-Error:']["message"], "location cannot be missing")
+
+    def test_description_none(self):
+        '''Test for description none'''
+        response = self.app().post("/api/v2/businesses",
+                                 data=json.dumps(dict(business_name="Andela", category="software",
+                                                      location="Nairobi")),
+                                 headers={
+                                     "Authorization": "Bearer {}".format(self.access_token),
+                                     "Content-Type": "application/json"
+                                     })
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['description-Error:']["message"], "description cannot be missing")
+
 
     def test_add_unauthorized_if_no_token_passed(self):
         

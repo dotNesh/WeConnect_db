@@ -19,7 +19,7 @@ class ReviewsTestcase(unittest.TestCase):
             db.create_all()  
 
         self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nina@live",username="nina",
+                    data=json.dumps(dict(email="nina@live.com",username="nina",
                                 password="12345678")), content_type="application/json") 
 
         self.login_user = self.app().post("/api/v2/auth/login",
@@ -29,7 +29,7 @@ class ReviewsTestcase(unittest.TestCase):
         self.access_token = json.loads(self.login_user.data.decode())['token']
 
         self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nesh@live",username="nesh",
+                    data=json.dumps(dict(email="nesh@live.com",username="nesh",
                                 password="12345678")), content_type="application/json") 
 
         self.login_user2 = self.app().post("/api/v2/auth/login",

@@ -21,19 +21,23 @@ class Users(db.Model):
         self.email = email
         self.username = username
         self.password = generate_password_hash(password)
+
     def create_user(self):
         '''creates a user'''
         db.session.add(self)
         db.session.commit()
+
     def check_password(self, password):
         '''Check Password'''
         return check_password_hash(self.password,password)
+
     @staticmethod
     def reset_password(username, password):
         '''Reset Password'''
         person = Users.query.filter_by(username=username).first()
         person.password = generate_password_hash(password)
-        person.create_user()    
+        person.create_user()
+               
 class Businesses(db.Model):
     '''Models for table businesses'''
 
@@ -70,6 +74,7 @@ class Businesses(db.Model):
         '''Register a Business'''
         db.session.add(self)
         db.session.commit()
+
     @staticmethod
     def get_all():
         '''Get all the businesses'''
