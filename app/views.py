@@ -67,29 +67,16 @@ def login():
     data = {"username":username, "password":password}
     if validate.inputs(data):
         return jsonify(validate.inputs(data)), 406
-    
-    existing_user = Users.query.filter_by(username= username).first()
-    if existing_user:
-        valid_user = existing_user.check_password(password)
-        if valid_user:
-            access_token = create_access_token(identity=existing_user.id)
-            response = {
-                'message':'Welcome ' + username + ". Log In Succesful!",
-                'token': access_token
-                }        
-            return make_response(jsonify(response)), 200 
 
-        else:
-            response = {
-                'message':"Invalid Password!"
-                }
-            return make_response(jsonify(response['message'])), 401   
+    if validate.valid_user(data)['message'] == "Invalid Password!":
+        return jsonify(validate.valid_user(data)['message']) , 401
+    
+    if validate.valid_user(data)['message'] == "Non-Existent User!":
+        return jsonify(validate.valid_user(data)['message']) , 404
 
     else:
-        response = {
-        'message':"Non-Existent User!"
-        }
-        return make_response(jsonify(response['message'])), 404
+        return jsonify(validate.valid_user(data)) , 200
+
 
 @app.route('/api/v2/auth/reset-password', methods=['POST'])
 def reset():
@@ -296,6 +283,4 @@ def get_reviews(business_id):
             return jsonify({'message':'No reviews yet.Please review business'}), 404
     else: 
         return jsonify({'message':'Resource(Business) Not Found'}), 404      
-
-
 

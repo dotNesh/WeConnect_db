@@ -1,6 +1,7 @@
 '''Contains validations'''
 import re
 from app.models import Users, Businesses, Reviews
+from flask_jwt_extended import create_access_token
 
 def existing(data):
     messages = {}
@@ -17,6 +18,27 @@ def existing(data):
             messages.update({"Email-Duplication":message})
 
     return messages
+
+def valid_user(data):
+    messages = {}
+    if 'username' in data.keys():
+        ex = Users.query.filter_by(username=data['username']).first()
+        if ex:
+            valid_user = ex.check_password(data['password'])
+            if valid_user:
+                access_token = create_access_token(identity=ex.id)
+                message = {'message':'Welcome ' + data['username'] + ". Log In Succesful!",'token': access_token}
+                messages.update(message)
+            
+            else:
+                message = {'message':"Invalid Password!"}
+                messages.update(message)
+        else:
+            message = {'message':"Non-Existent User!"}
+            messages.update(message)
+
+    return messages
+    
 
 def inputs(data):
     messages = {}

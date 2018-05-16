@@ -139,7 +139,7 @@ class UserTestcase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Welcome nina. Log In Succesful!")
+        self.assertEqual(response_msg['message'],"Welcome nina. Log In Succesful!")
         self.assertTrue(response_msg['token'])
 
     def test_username_none_login(self):
