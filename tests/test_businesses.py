@@ -3,73 +3,19 @@ import json
 from flask import Flask
 from app.models import Users, Businesses
 from app import app, db
+from .test_base import BaseTestCase
 
-class BusinessTestcase(unittest.TestCase):
-    '''Test for class user'''
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['WTF_CSRF_ENABLED'] = False
-        app.config['DEBUG'] = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres17!@localhost/weconnect_test'
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
-        self.app = app.test_client 
-        db.init_app(app)
-        with app.app_context():
-            db.drop_all()
-            db.create_all()  
-        '''User 1'''
-        self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nina@live.com",username="nina",
-                                password="12345678")), content_type="application/json") 
-
-        self.login_user = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="nina",password="12345678")),
-                                         content_type="application/json") 
-      
-        self.access_token = json.loads(self.login_user.data.decode())['token']  
-
-        '''User 2'''
-        self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="ron@live.com",username="ronn",
-                                password="12345678")), content_type="application/json") 
-
-        self.login_user2 = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="ronn",password="12345678")),
-                                         content_type="application/json") 
-      
-        self.access_token2 = json.loads(self.login_user2.data.decode())['token']                                     
-        
-        self.app().post("/api/v2/businesses",
-                                data=json.dumps(dict(
-                                    business_name="Andela",
-                                    category="software",
-                                    location="Nairobi",
-                                    description="This is Andela",
-                                    owner_id="1")),
-                                headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token),
-                                    "Content-Type": "application/json"
-                                })
-        self.dict = dict(
-                    business_name="Mutura",
-                    category="Food & Drinks",
-                    location="Nairobi",
-                    description="Tamu Sana",
-                    owner_id="1")    
-   
+class BusinessTestcase(BaseTestCase):    
     def test_add_business(self): 
-        response = self.app().post("/api/v2/businesses",
-                                data=json.dumps(self.dict),
-                                headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token),
-                                    "Content-Type": "application/json"
-                                })
+        response = self.register_business()
         self.assertEqual(response.status_code, 201)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Mutura. Business successfully registered by nina")
+        self.assertEqual(response_msg,"Andela. Business successfully registered by nina")
     
     def test_business_name_empty(self):
         '''Test for blank business name'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="", category="software",
                                                       location="Nairobi",
@@ -85,6 +31,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_category_empty(self):
         '''Test for blank category'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela", category="",
                                                       location="Nairobi",
@@ -100,6 +48,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_location_empty(self):
         '''Test for blank location'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela", category="software",
                                                       location="", description="This is Andela")),
@@ -114,6 +64,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_description_empty(self):
         '''Test for blank description'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela", category="software",
                                                       location="Nairobi", description="")),
@@ -128,6 +80,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_business_name_none(self):
         '''Test for business name none'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(category="software",
                                                       location="Nairobi",
@@ -143,6 +97,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_category_none(self):
         '''Test for category none'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela",
                                                       location="Nairobi",
@@ -158,6 +114,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_location_none(self):
         '''Test for location none'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela", category="software",
                                                      description="This is Andela")),
@@ -172,6 +130,8 @@ class BusinessTestcase(unittest.TestCase):
 
     def test_description_none(self):
         '''Test for description none'''
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
                                  data=json.dumps(dict(business_name="Andela", category="software",
                                                       location="Nairobi")),
@@ -188,49 +148,46 @@ class BusinessTestcase(unittest.TestCase):
     def test_add_unauthorized_if_no_token_passed(self):
         
         response = self.app().post("/api/v2/businesses",
-                                data=json.dumps( self.dict),
+                                data=json.dumps(self.business),
                                 headers = {
                                     "Content-Type": "application/json"
                                 })
         self.assertEqual(response.status_code, 401)
 
     def test_existing_business_name(self):
+        self.register_business()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
-                                data=json.dumps(dict(
-                                    business_name="Andela",
-                                    category="software",
-                                    location="Nairobi",
-                                    description="This is Andela",
-                                    owner_id="2")),
+                                data=json.dumps(self.business),
                                 headers = {
                                     "Authorization": "Bearer {}".format(self.access_token),
                                     "Content-Type": "application/json"
                                 })
         self.assertEqual(response.status_code, 409)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Business Name Taken!") 
+        self.assertEqual(response_msg,"Business Name Taken!")
+
     def test_get_businesses(self):
         '''test get all businesses'''
+        self.register_business()
         response = self.app().get("/api/v2/businesses",
                                     headers = {
                                     "Content-Type": "application/json"
                                     })
         self.assertEqual(response.status_code, 200)
+
     def test_get_businesses_if_none(self):
         '''test get all businesses'''
-        self.app().delete("/api/v2/businesses/1",
-                                headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token),
-                                    "Content-Type": "application/json"
-                                })
         response = self.app().get("/api/v2/businesses",
                                     headers = {
                                     "Content-Type": "application/json"
                                     })
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['message'],"No businesses yet")     
+        self.assertEqual(response_msg['message'],"No businesses yet") 
+
     def test_get_one_business(self):
+        self.register_business()
         response = self.app().get("/api/v2/businesses/1",
                                     headers = {
                                     "Content-Type": "application/json"
@@ -240,36 +197,30 @@ class BusinessTestcase(unittest.TestCase):
         self.assertEqual(response_msg['1']['Business name'],"Andela") 
 
     def test_business_not_found(self):
-        response = self.app().get("/api/v2/businesses/11",
+        response = self.app().get("/api/v2/businesses/1",
                                     headers = {
                                     "Content-Type": "application/json"
                                     })
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"Resource Not Found")
+
     def test_business_update(self):
-        response = self.app().put("/api/v2/businesses/1",
-                                data=json.dumps(dict(
-                                    category="software development",
-                                    location="Kampala",
-                                    description="TIA")
-                                ),
-                                headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token),
-                                    "Content-Type": "application/json"
-                                })
+        response = self.update_business()
         self.assertEqual(response.status_code, 201)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"Successfully Updated")
+
     def test_business_update_not_owner(self):
+        self.register_user()
+        self.register_business()
+        self.register_user2()
+        self.access_token = json.loads(self.login_user2().data.decode())['token']
+
         response = self.app().put("/api/v2/businesses/1",
-                                data=json.dumps(dict(
-                                    category="software development",
-                                    location="Kampala",
-                                    description="TIA")
-                                ),
+                                data=json.dumps(self.update),
                                 headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token2),
+                                    "Authorization": "Bearer {}".format(self.access_token),
                                     "Content-Type": "application/json"
                                 })
         self.assertEqual(response.status_code, 401)
@@ -277,12 +228,11 @@ class BusinessTestcase(unittest.TestCase):
         self.assertEqual(response_msg["message"],"You cannot update a business that is not yours")
 
     def test_business_update_not_found(self):
-        response = self.app().put("/api/v2/businesses/11",
-                                data=json.dumps(dict(
-                                    category="software development",
-                                    location="Kampala",
-                                    description="TIA")
-                                ),
+        self.register_user()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
+
+        response = self.app().put("/api/v2/businesses/1",
+                                data=json.dumps(self.update),
                                 headers = {
                                     "Authorization": "Bearer {}".format(self.access_token),
                                     "Content-Type": "application/json"
@@ -290,27 +240,33 @@ class BusinessTestcase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"Cannot Update. Resource(Business) Not Found")
+
     def test_business_delete(self):
+        response = self.delete_business()  
+        self.assertEqual(response.status_code, 201)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Successfully Deleted")
+
+    def test_business_delete_not_owner(self):
+        self.register_user()
+        self.register_business()
+        self.register_user2()
+        self.access_token = json.loads(self.login_user2().data.decode())['token']
+
         response = self.app().delete("/api/v2/businesses/1",
                                 headers = {
                                     "Authorization": "Bearer {}".format(self.access_token),
                                     "Content-Type": "application/json"
                                 })  
-        
-        self.assertEqual(response.status_code, 201)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Successfully Deleted")
-    def test_business_delete_not_owner(self):
-        response = self.app().delete("/api/v2/businesses/1",
-                                headers = {
-                                    "Authorization": "Bearer {}".format(self.access_token2),
-                                    "Content-Type": "application/json"
-                                })  
         self.assertEqual(response.status_code, 401)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"You cannot delete a business that is not yours")
+        
     def test_business_delete_not_found(self):
-        response = self.app().delete("/api/v2/businesses/11",
+        self.register_user()
+        self.access_token = json.loads(self.login_user().data.decode())['token']
+
+        response = self.app().delete("/api/v2/businesses/1",
                                 headers = {
                                     "Authorization": "Bearer {}".format(self.access_token),
                                     "Content-Type": "application/json"
@@ -318,4 +274,12 @@ class BusinessTestcase(unittest.TestCase):
         
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Cannot Delete. Resource(Business) Not Found")                                      
+        self.assertEqual(response_msg["message"],"Cannot Delete. Resource(Business) Not Found")
+
+    def test_business_search(self):
+        response = self.search_business()
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["1"]["Business name"],"Andela")
+
