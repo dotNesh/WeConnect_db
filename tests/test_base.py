@@ -116,6 +116,16 @@ class BaseTestCase(unittest.TestCase):
                                     "Content-Type": "application/json"
                                 })
         return response
+    
+    def filter_business(self):
+        self.register_user()
+        self.register_business()
+        response = self.app().get("/api/v2/businesses/search?category=software&location=Nairobi",
+                            headers = {
+                                    "Content-Type": "application/json"
+                                })
+        return response
+        
         
     def post_review(self):
         self.register_user()

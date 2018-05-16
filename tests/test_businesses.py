@@ -277,9 +277,17 @@ class BusinessTestcase(BaseTestCase):
         self.assertEqual(response_msg["message"],"Cannot Delete. Resource(Business) Not Found")
 
     def test_business_search(self):
+        response = self.filter_business()
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["1"]["Business name"],"Andela")
+
+    def test_business_filter(self):
         response = self.search_business()
 
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["1"]["Business name"],"Andela")
+        
 
