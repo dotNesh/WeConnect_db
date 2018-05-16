@@ -175,7 +175,7 @@ def get_business():
 @app.route('/api/v2/businesses/search', methods=['GET'])
 def search():
     '''Route to search and filter businesses'''
-    data_name = request.args.get('name',type=str)
+    data_name = request.args.get('q',type=str)
     data_category = request.args.get('category',type=str)
     data_location = request.args.get('location',type=str)
 
