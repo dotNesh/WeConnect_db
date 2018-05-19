@@ -6,6 +6,7 @@ from app import app, db
 class BaseTestCase(unittest.TestCase):
     '''Base Tests'''
     def setUp(self):
+        '''Test Setup'''
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['DEBUG'] = False
@@ -21,50 +22,64 @@ class BaseTestCase(unittest.TestCase):
         self.user2={"username":"kelvin","email":"kelvin@live.com","password":"12345678"}
         self.login={"username":"nina","password":"12345678"}
         self.login2={"username":"kelvin","password":"12345678"}
-        self.reset={"username":"nina","new_password":"12s45678"}
+        self.change={"username":"nina","old_password":"12345678","new_password":"123645678"}
+        self.change2={"username":"nina","old_password":"12345658","new_password":"12s45678"}
         self.business={"business_name":"Andela","category":"software","location":"Nairobi",
-                        "description":"This is Andela","owner_id":"1"}
+                        "description":"This is Andela"}
         self.update={"category":"Food","location":"Thika","description":"This is America"}
-        self.review={"title":"The best","description":"I love being here","reviewer":"nesh",
-                    "user_id":"2","business_id":"1"}
+        self.review={"title":"The best","description":"I love being here"}
     
     def register_user(self):
+        '''Register a user'''
         response = self.app().post("/api/v2/auth/register",
                     data=json.dumps(self.user), 
                     content_type="application/json")
         return response
     
     def register_user2(self):
+        '''Register a second user'''
         response = self.app().post("/api/v2/auth/register",
                     data=json.dumps(self.user2), 
                     content_type="application/json")
         return response
     
     def login_user(self):
+        '''Login a user'''
         response = self.app().post("/api/v2/auth/login",
                     data=json.dumps(self.login), 
                     content_type="application/json")
         return response
     
     def login_user2(self):
+        '''Login a second user'''
         response = self.app().post("/api/v2/auth/login",
                     data=json.dumps(self.login2), 
                     content_type="application/json")
         return response
     
     def change_password(self):
-        response = self.app().post("/api/v2/auth/reset-password",
-                        data=json.dumps(self.reset),
+        '''change password'''
+        response = self.app().post("/api/v2/auth/change-password",
+                        data=json.dumps(self.change),
+                                         content_type="application/json")
+        return response
+    
+    def change_password_wrong(self):
+        '''change password'''
+        response = self.app().post("/api/v2/auth/change-password",
+                        data=json.dumps(self.change2),
                                          content_type="application/json")
         return response
 
     def reset_password(self):
-        response = self.app().post("/api/v2/auth/change-password",
+        '''reset password'''
+        response = self.app().post("/api/v2/auth/reset-password",
                         data=json.dumps(dict(username="nina")),
                                          content_type="application/json")
         return response
          
     def logout_user(self):
+        '''logout user'''
         self.register_user()
         self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/auth/logout",
@@ -75,6 +90,7 @@ class BaseTestCase(unittest.TestCase):
         return response
         
     def register_business(self):
+        '''register a business'''
         self.register_user()
         self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().post("/api/v2/businesses",
@@ -86,7 +102,7 @@ class BaseTestCase(unittest.TestCase):
         return response
 
     def update_business(self):
-        self.register_user()
+        '''update a business'''
         self.register_business()
         self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().put("/api/v2/businesses/1",
@@ -98,7 +114,7 @@ class BaseTestCase(unittest.TestCase):
         return response
     
     def delete_business(self):
-        self.register_user()
+        '''delete a business'''
         self.register_business()
         self.access_token = json.loads(self.login_user().data.decode())['token']
         response = self.app().delete("/api/v2/businesses/1",
@@ -109,7 +125,7 @@ class BaseTestCase(unittest.TestCase):
         return response
 
     def search_business(self):
-        self.register_user()
+        '''search'''
         self.register_business()
         response = self.app().get("/api/v2/businesses/search?q=andela",
                             headers = {
@@ -118,7 +134,7 @@ class BaseTestCase(unittest.TestCase):
         return response
     
     def filter_business(self):
-        self.register_user()
+        '''filter'''
         self.register_business()
         response = self.app().get("/api/v2/businesses/search?category=software&location=Nairobi",
                             headers = {
@@ -128,7 +144,7 @@ class BaseTestCase(unittest.TestCase):
         
         
     def post_review(self):
-        self.register_user()
+        '''Post review'''
         self.register_business()
         self.register_user2()
         self.access_token = json.loads(self.login_user2().data.decode())['token']
@@ -139,10 +155,3 @@ class BaseTestCase(unittest.TestCase):
                                     "Content-Type": "application/json"
                                 })
         return response
-
-
-
-
-        
-        
-

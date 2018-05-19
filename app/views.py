@@ -78,33 +78,38 @@ def login():
         return jsonify(validate.valid_user(data)) , 200
 
 
-@app.route('/api/v2/auth/reset-password', methods=['POST'])
-def reset():
+@app.route('/api/v2/auth/change-password', methods=['POST'])
+def change_password():
     '''Route to reset a password'''
     data = request.get_json()
     username = data.get('username')
+    old_password = data.get('old_password')
     new_password = data.get('new_password')
+    data = {"username":username,"old_password":old_password,"password":new_password}
 
-    existing_username = Users.query.filter_by(username=username).first()
-    if existing_username:
+    if validate.inputs(data):
+        return jsonify(validate.inputs(data)), 406
+    
+    if validate.pattern(data):
+        return jsonify(validate.pattern(data)), 406
+
+    data = {"username":username,"password":old_password,"new_password":new_password}
+    if validate.valid_user(data)['message'] == "Welcome, Log In Succesful!":
         Users.reset_password(username, new_password)
-        return jsonify({'message':'Password Reset'}), 201
+        return jsonify({'message':'Password changed'}), 201
 
     else:
-        response = {
-        'message':"Non-Existent User!"
-        }
-        return make_response(jsonify(response['message'])), 404
+        return jsonify(validate.valid_user(data)) , 401
+        
 
-@app.route('/api/v2/auth/change-password', methods=['POST'])
-def change():
+@app.route('/api/v2/auth/reset-password', methods=['POST'])
+def reset_password():
     '''Route to change a password'''
     data = request.get_json()
     username = data.get('username')
 
     existing_username = Users.query.filter_by(username= username).first()
     if existing_username:
-        print("ex",existing_username)
         password = str(uuid.uuid4())[:8]
         Users.reset_password(username, password)
         message = Message(
@@ -257,14 +262,14 @@ def reviews(business_id):
             review_data = request.get_json()
             title = review_data.get('title')
             description = review_data.get('description') 
+            data = {"title":title, "description":description}
+            if validate.inputs(data):
+                return jsonify(validate.inputs(data)), 406
             user_id = business.owner_id
             business_id = business.id
             new_review = Reviews(title, description,user_id,business_id)
             new_review.add_review()
-        
-            response = {
-                        'message': 'Review Posted',
-                        }
+            response = {'message': 'Review Posted',}
             return make_response(jsonify(response)), 201
         else:
             return jsonify({'message':'Cannot Review your own Business'}), 401   

@@ -27,7 +27,7 @@ def valid_user(data):
             valid_user = ex.check_password(data['password'])
             if valid_user:
                 access_token = create_access_token(identity=ex.id)
-                message = {'message':'Welcome ' + data['username'] + ". Log In Succesful!",'token': access_token}
+                message = {'message':"Welcome, Log In Succesful!",'token': access_token}
                 messages.update(message)
             
             else:
@@ -61,7 +61,7 @@ def pattern(data):
            message = {"message":"Email format is user@example.com"}
            messages.update({"Email-Format":message})
     
-    if 'password' in data.keys():
+    if 'password'  in data.keys():
         pattern = re.match(r'[A-Za-z0-9@#$%^&+=]{8,}', data['password'])
         if not pattern:
             message = {"message":"Must have at least 8 characters"}

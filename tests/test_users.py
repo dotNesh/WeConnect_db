@@ -1,9 +1,6 @@
 '''API User Route tests'''
 import unittest 
 import json
-from flask import Flask
-from app.models import Users, Businesses
-from app import app, db
 from .test_base import BaseTestCase
 
 class UserTestcase(BaseTestCase):
@@ -52,6 +49,17 @@ class UserTestcase(BaseTestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg['Password-Format']['message'],"Must have at least 8 characters")
 
+    def test_new_password_pattern(self):
+        self.register_user2()
+        response = self.app().post("/api/v2/auth/change-password",
+                    data=json.dumps(dict(username="kelvin",old_password="12345678",
+                                new_password="1234")), content_type="application/json")
+
+        self.assertEqual(response.status_code, 406)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['Password-Format']['message'],"Must have at least 8 characters")
+
+
     def test_username_pattern(self):
         response = self.app().post("/api/v2/auth/register",
                     data=json.dumps(dict(email="ninaa@live.com",username="km",
@@ -59,62 +67,7 @@ class UserTestcase(BaseTestCase):
 
         self.assertEqual(response.status_code, 406)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['Username-Format']['message'],"Must have atleast 3 character and no white spaces")
-
-    def test_username_none(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="ninaa@live.com",
-                                password="12345678")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['username-Error:']['message'],"username cannot be missing")
-
-    def test_email_none(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(username="ninaa",
-                                password="12345678")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['email-Error:']['message'],"email cannot be missing")
-
-    def test_password_none(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="ninaa@live.com",
-                                username="12345678")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['password-Error:']['message'],"password cannot be missing")
-
-    def test_username_blank(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nina@live",username="",
-                                password="12345678")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['username-Error:']['message'],"username cannot be an empty string")
-
-    def test_email_blank(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="",username="neshh",
-                                password="12345678")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['email-Error:']['message'],"email cannot be an empty string")
-
-    def test_password_blank(self):
-        response = self.app().post("/api/v2/auth/register",
-                    data=json.dumps(dict(email="nina@live",username="neshhh",
-                                password="")), content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['password-Error:']['message'],"password cannot be an empty string")
-        
+        self.assertEqual(response_msg['Username-Format']['message'],"Must have atleast 3 character and no white spaces")        
     
     def test_login(self):
         self.register_user()
@@ -122,45 +75,10 @@ class UserTestcase(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['message'],"Welcome nina. Log In Succesful!")
+        self.assertEqual(response_msg['message'],"Welcome, Log In Succesful!")
         self.assertTrue(response_msg['token'])
 
-    def test_username_none_login(self):
-        response = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(password="12345678")),
-                                         content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['username-Error:']['message'],"username cannot be missing")
-
-    def test_password_none_login(self):
-        response = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="nina")),
-                                         content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['password-Error:']['message'],"password cannot be missing")
-
-    def test_username_blank_login(self):
-        response = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="",password="12345678")),
-                                         content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['username-Error:']['message'],"username cannot be an empty string")
-
-    def test_password_blank_login(self):
-        response = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="nesh",password="")),
-                                         content_type="application/json")
-
-        self.assertEqual(response.status_code, 406)
-        response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['password-Error:']['message'],"password cannot be an empty string")
-
+    
     def test_wrong_password(self):
         self.register_user()
         response = self.app().post("/api/v2/auth/login",
@@ -179,17 +97,24 @@ class UserTestcase(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg,"Non-Existent User!")
-
+    
     def test_password_change(self):
+        self.register_user()
+        response = self.change_password()
+        self.assertEqual(response.status_code, 201)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['message'],"Password changed")
+        
+    def test_login_after_password_change(self):
         self.register_user()
         self.change_password()
         response = self.app().post("/api/v2/auth/login",
-                        data=json.dumps(dict(username="nina",password="12s45678")),
+                        data=json.dumps(dict(username="nina",password="123645678")),
                                          content_type="application/json")
 
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Welcome nina. Log In Succesful!")
+        self.assertEqual(response_msg["message"],"Welcome, Log In Succesful!")
         self.assertTrue(response_msg['token'])
 
     def test_reset_password(self):
@@ -200,18 +125,22 @@ class UserTestcase(BaseTestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"An email has been sent with your new password!")
 
-
     def test_password_change_no_user(self):
         response = self.change_password()
-        self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg,"Non-Existent User!")
+        self.assertEqual(response_msg['message'],"Non-Existent User!")
+
+    def test_password_change_wrong_password(self):
+        self.register_user()
+        response = self.change_password_wrong()
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['message'],"Invalid Password!")
       
     def test_logout_user(self):
         response =  self.logout_user()
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['message'],"Logout successful") 
+        self.assertEqual(response_msg['message'],"Logout successful")
 
 if __name__ == '__main__':
     unittest.main()       
