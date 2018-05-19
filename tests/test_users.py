@@ -118,6 +118,13 @@ class UserTestcase(BaseTestCase):
         self.assertTrue(response_msg['token'])
 
     def test_reset_password(self):
+        response = self.reset_password()
+
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Non-existent user. Try signing up")
+
+    def test_reset_password_non_existing(self):
         self.register_user()
         response = self.reset_password()
 

@@ -124,6 +124,17 @@ class BusinessTestcase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["1"]["Business name"],"Andela")
+    
+    def test_business_search_no_match(self):
+        '''Test Business search'''
+        self.register_business()
+        response = self.app().get("/api/v2/businesses/search?category=food&location=kenya",
+                            headers = {
+                                    "Content-Type": "application/json"
+                                })
+        self.assertEqual(response.status_code, 404)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"No Match found")
 
     def test_business_filter(self):
         '''Test Business filter'''
