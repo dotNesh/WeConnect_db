@@ -222,5 +222,3 @@ class ValidationTestcase(BaseTestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg['description-Error:']["message"], "description cannot be missing")
 
-if __name__ == '__main__':
-    unittest.main()

@@ -170,22 +170,29 @@ def register_business():
 @app.route('/api/v2/businesses', methods=['GET'])
 def get_business():
     '''Route to get all the businesses'''
-    businesses = Businesses.get_all()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 2, type=int)
+    businesses = Businesses.get_all(page, limit)
     if len(businesses) > 0:
         obj= [business.serialize() for business in businesses]   
         return make_response(jsonify(obj)), 200
+    elif len(businesses) == 0 and page == 1:
+        return jsonify({'message': 'No businesses yet'}), 404    
     else:
-        return jsonify({'message': 'No businesses yet'}), 404
+        return jsonify({'message': 'Nothing on this page'}), 200
 
 @app.route('/api/v2/businesses/search', methods=['GET'])
 def search():
     '''Route to search and filter businesses'''
-    data_name = request.args.get('q',type=str)
-    data_category = request.args.get('category',type=str)
-    data_location = request.args.get('location',type=str)
+    search = request.args.get('q',type=str)
+    category = request.args.get('category',type=str)
+    location = request.args.get('location',type=str)
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 2, type=int)
 
-    businesses = Businesses.search(data_name, data_category, data_location)
+    businesses = Businesses.search(search, category, location, page, limit)
     results = {}
+    ctx = {'Businesses':results,'Current Page':page}
     if len(businesses) > 0:
         for business in businesses:
             obj = {business.id:{
@@ -195,13 +202,14 @@ def search():
                 'Created By': business.owner.username,
                 'Description':business.description,
                 'Created on':business.posted_on
-                }
+                },
             }
-            
-            results.update(obj)         
-        return make_response(jsonify(results)), 200
+            results.update(obj)     
+        return make_response(jsonify(ctx)), 200
+    elif len(businesses) == 0 and page == 1:
+        return jsonify({'message': 'No Match found'}), 404 
     else:
-        return jsonify({'message': 'No Match found'}), 404
+        return jsonify({'message': 'Nothing on this page'}), 200
 
 
 @app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   

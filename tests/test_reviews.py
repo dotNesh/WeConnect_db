@@ -138,6 +138,3 @@ class ReviewsTestcase(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"Resource(Business) Not Found")
-
-if __name__ == '__main__':
-    unittest.main()

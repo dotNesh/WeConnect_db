@@ -149,6 +149,3 @@ class UserTestcase(BaseTestCase):
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg['message'],"Logout successful")
 
-if __name__ == '__main__':
-    unittest.main()       
-        

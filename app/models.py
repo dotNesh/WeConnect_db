@@ -76,14 +76,19 @@ class Businesses(db.Model):
         db.session.commit()
 
     @staticmethod
-    def get_all():
+    def get_all(page, limit):
         '''Get all the businesses'''
-        return Businesses.query.all()
+        subquery = Businesses.query
+        offset = (page - 1)*limit
+        subquery = subquery.limit(limit).offset(offset)
+        
+        return subquery.all()
     
     @staticmethod
-    def search(data_name, category, location):
+    def search(data_name, category, location, page, limit):
         '''Search'''
         subquery = Businesses.query
+        
         if data_name is not None:
             bizname = "%"+data_name+"%"
             subquery = subquery.filter(Businesses.business_name.ilike(bizname))
@@ -92,6 +97,8 @@ class Businesses(db.Model):
         if location is not None:
             subquery = subquery.filter_by(location=location)
 
+        offset = (page - 1)*limit
+        subquery = subquery.limit(limit).offset(offset)
         return subquery.all()
 
     @staticmethod

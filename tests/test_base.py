@@ -136,12 +136,11 @@ class BaseTestCase(unittest.TestCase):
     def filter_business(self):
         '''filter'''
         self.register_business()
-        response = self.app().get("/api/v2/businesses/search?category=software&location=Nairobi",
+        response = self.app().get("/api/v2/businesses/search?category=software&location=Nairobi&page=1&limit=2",
                             headers = {
                                     "Content-Type": "application/json"
                                 })
         return response
-        
         
     def post_review(self):
         '''Post review'''

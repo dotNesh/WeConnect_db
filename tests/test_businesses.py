@@ -31,9 +31,19 @@ class BusinessTestcase(BaseTestCase):
     def test_get_businesses(self):
         '''test get all businesses'''
         self.register_business()
-        response = self.app().get("/api/v2/businesses",headers = {"Content-Type": "application/json"})
+        response = self.app().get("/api/v2/businesses?page=1&limit=2",headers = {"Content-Type": "application/json"})
 
         self.assertEqual(response.status_code, 200)
+        
+
+    def test_get_businesses_none_on_page(self):
+        '''test get no businesses on page'''
+        self.register_business()
+        response = self.app().get("/api/v2/businesses?page=2&limit=2",headers = {"Content-Type": "application/json"})
+
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg['message'],"Nothing on this page")
 
     def test_get_businesses_if_none(self):
         '''test get all businesses'''
@@ -123,7 +133,7 @@ class BusinessTestcase(BaseTestCase):
         response = self.filter_business()
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["1"]["Business name"],"Andela")
+        self.assertEqual(response_msg["Businesses"]["1"]["Business name"],"Andela")
     
     def test_business_search_no_match(self):
         '''Test Business search'''
@@ -135,13 +145,23 @@ class BusinessTestcase(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["message"],"No Match found")
+    
+    def test_business_search_nothing_on_page(self):
+        '''Test Business search nothing on page '''
+        self.register_business()
+        response = self.app().get("/api/v2/businesses/search?category=software&location=Nairobi&page=3&limit=2",
+                            headers = {
+                                    "Content-Type": "application/json"
+                                })
+        self.assertEqual(response.status_code, 200)
+        response_msg = json.loads(response.data.decode("UTF-8"))
+        self.assertEqual(response_msg["message"],"Nothing on this page")
 
     def test_business_filter(self):
         '''Test Business filter'''
         response = self.search_business()
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["1"]["Business name"],"Andela")
+        self.assertEqual(response_msg["Businesses"]["1"]["Business name"],"Andela")
         
-if __name__ == '__main__':
-    unittest.main()
+
