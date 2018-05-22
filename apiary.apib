@@ -1,0 +1,264 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+FORMAT: 1A
+HOST: https://dashboard.heroku.com/apps/weconnect-nesh/
+
+# WeConnect
+WeConnect provides a platform that brings businesses and individuals together.
+This platform creates awareness for businesses and gives the users the
+ability to write reviews about the businesses they have interacted with.
+
+## User Registration [/api/v1/auth/register]
+All requests sent by client to register new user accounts are handled by
+this resource. Receives data in `json` format and it should check that
+all the required fields are supplied.
+
+### Register a user [POST]
++ Request (application/json)
+Request is sent with the user details in `json` format after validation
+            
+    - Body
+        
+            {
+                "email": "kmunene@live.com"
+                "username":"Nesh123"
+                "password":"fhdfjd45"
+            }
+    
++ Response 200 (application/json)
+It returns a response after all the inputs have been validated
+    - Headers
+        
+            
+    - Body 
+                
+            {
+                "message": "User Succesfully Registered"
+            }
+            
++ Response 409 (applicaton/json)
+Returns response for an already existing email.   
+    - Headers
+    
+    - Body 
+            
+            {
+                "message": "Email already existing."
+            }
+
++ Response 409 (applicaton/json)
+Returns response for an already existing username.   
+    - Headers
+    
+    - Body 
+            
+            {
+                "message": "Username already existing."
+            }
+
+
+## User Login [/api/v1/auth/login]
+All requests sent by client to login a user account are handled by
+this resource. Receives data in `json` format and it should check that
+all the required fields are supplied.
+
+### Login a user [POST]
++ Request (application/json)
+The request carries the user data passed in `json` format after validation
+
+    - Headers
+    
+    - Body
+    
+            {
+                "email": "kmunene@live.com"
+                "password":"Nesh1233"
+            }
+
++ Response 201 (application/json)
+Returns a tokenstring upon validating user input
+    - Headers
+        
+            
+    - Body 
+                
+            {
+                "token": "tokenstring"
+            }  
+    
+
+
+
+
+## Business [/api/v1/business/]
+All requests sent by client to register new Business accounts are handled by
+this resource. Receives data in `json` format and it should check that
+all the required fields are supplied.
+
+
+### Register Business [POST]
++ Request (application/json)
+The request carries business deatails in `json` format after validating the inputs.
+
+    - Headers
+
+            Auhtorization : Bearer tokenstring
+            
+    - Body
+        
+            {
+                "business_name": "Andela"
+                "description":"This is Andela"
+                "category":"Sofrware"
+                "location":"Nairobi"
+            }
+    
++ Response 201 (application/json)
+Returns a `json` success message upon validating the user input.
+    - Headers
+        
+            
+    - Body 
+                
+            {
+                "message": "Business Successfully Registered"
+            }
+            
++ Response 409 (application/json)
+Returns a  json `json` message  
+    - Headers
+        
+            
+    - Body 
+                
+            {
+                "message": "Business already exists"
+            }
+            
+                
+### Get Businesses [GET]
+    
++ Response 200 (application/json)
+Returns `json` objects upon sending the get request.
+
+    - Headers 
+
+            
+    - Body 
+                
+            {
+                "business_name": "Andela"
+                "description":"This is Andela"
+                "category":"Sofrware"
+                "location":"Nairobi"
+            }
+    
+## Business Search and Filter [/api/v1/business/search]
+
+### Search Businesses [GET]
+
+### Filter Businesses [GET]
+
+### Pagination [GET]
+
+## Single Business [/api/v1/business/{id}]
+All requests are  that  sent by the client retrieves a single Business account are handled by
+this resource. Receives data in `json` format and it should check that
+all the required fields are supplied.
+
++ Parameters
+    - id: 1 (string) - the id of the business
+    
+
+### Get Business [GET]
+Resquest sent to this resource returns all the businesses in the database.
+            
+    
++ Response 200 (application/json)
+Returns `json` object upon  sending the get request for a specific business.
+
+    - Headers 
+
+            
+    - Body 
+                
+            {
+                "business_name": "Andela"
+                "description":"This is Andela"
+                "category":"Sofrware"
+                "location":"Nairobi"
+            }
+    
+
+### Update Business[PUT]
+This enpoint updates the business.
++ Request (application/json)
+Request takes a token header and business 
+    - Header 
+            
+            Authorization: Bearer tokenstring
+            
+
+            
+    - Body
+        
+            {
+        
+                "category":"Food"
+            }
+    
++ Response 200 (application/json)
+Returns a `json` updated request of the post request sent.
+    - Headers
+        
+            
+    - Body 
+                
+            {
+                "businessname": "techbase",
+                "Description":"james7738",
+                "category":"Food",
+                "location":"runda"
+            }
+
+### Delete Business[DELETE]
+This endpoint deletes a business.
++ Response 202 (application/json)
+deletes a business upon validating the token passed in the headers.
+
+    - Headers
+
+                Authorization: Bearer tokenstring
+             
+    - Body 
+                
+            {
+                "message":"Business successfully deleted"
+            }
+            
++ Response 404 (application/json)
+Returnes when a queried business is not found in the database.   
+    - Headers
+               
+    - Body 
+                
+            {
+                "message":"Business not found"
+            }
+            
+## Logout [/api/v1/auth/logout]
+Requests sent by the client to this resource dumps the current token and renders it invalid.
+
+
+### Logout User[DELETE]
+The endpoint logs out a user
+
++ Response 200 (application/json)
+returns  a success `json` message after invalidating the token.
+            
+    - Body 
+                
+            {
+                "message":"Successfully logged out"
+            }
