@@ -1,2 +1,8 @@
 *.pytest_cache
 *venv
+*.env
+*pylintrc
+*.pyc
+*__pycache__
+*.coverage
+.vscode
