@@ -133,7 +133,7 @@ class BusinessTestcase(BaseTestCase):
         response = self.filter_business()
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["Businesses"][0]["1"]["business_name"],"Andela")
+        self.assertEqual(response_msg["Businesses"][0]["business_name"],"Andela")
     
     def test_business_search_no_match(self):
         '''Test Business search'''
@@ -162,6 +162,6 @@ class BusinessTestcase(BaseTestCase):
         response = self.search_business()
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["Businesses"][0]["1"]["business_name"],"Andela")
+        self.assertEqual(response_msg["Businesses"][0]["business_name"],"Andela")
         
 
