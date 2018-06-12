@@ -62,12 +62,11 @@ class Businesses(db.Model):
         self.owner_id = owner_id
 
     def serialize(self):
-        return {self.id:{
+        return {'business_id':self.id,
                 'business_name': self.business_name,
                 'category': self.category,
                 'location': self.location,
-                'description': self.description
-                }
+                'description': self.description       
         }
 
     def register_business(self):
