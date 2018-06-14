@@ -8,6 +8,10 @@ from werkzeug.security import check_password_hash
 from flask_mail import Mail, Message 
 from app import app
 
+
+from flask_cors import CORS
+CORS(app)
+
 #Mail configurations
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
