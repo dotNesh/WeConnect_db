@@ -200,9 +200,9 @@ def search():
         ctx = {'Businesses':obj,'Current Page':page}     
         return make_response(jsonify(ctx)), 200
     elif len(businesses) == 0 and page == 1:
-        return jsonify({'message': 'No Match found'}), 404 
+        return jsonify({'Businesses':{'message': 'No Match found'}}), 404 
     else:
-        return jsonify({'message': 'Nothing on this page'}), 200
+        return jsonify({'Businesses':{'message': 'Nothing on this page'}}), 200
 
 
 @app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   

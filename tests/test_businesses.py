@@ -136,7 +136,7 @@ class BusinessTestcase(BaseTestCase):
         self.assertEqual(response_msg["Businesses"][0]["business_name"],"Andela")
     
     def test_business_search_no_match(self):
-        '''Test Business search'''
+        '''Test Business search no match'''
         self.register_business()
         response = self.app().get("/api/v2/businesses/search?category=food&location=kenya",
                             headers = {
@@ -144,7 +144,7 @@ class BusinessTestcase(BaseTestCase):
                                 })
         self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"No Match found")
+        self.assertEqual(response_msg["Businesses"]["message"],"No Match found")
     
     def test_business_search_nothing_on_page(self):
         '''Test Business search nothing on page '''
@@ -155,7 +155,7 @@ class BusinessTestcase(BaseTestCase):
                                 })
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg["message"],"Nothing on this page")
+        self.assertEqual(response_msg["Businesses"]["message"],"Nothing on this page")
 
     def test_business_filter(self):
         '''Test Business filter'''
