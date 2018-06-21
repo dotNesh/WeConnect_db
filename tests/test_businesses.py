@@ -59,7 +59,7 @@ class BusinessTestcase(BaseTestCase):
         response = self.app().get("/api/v2/businesses/1",headers = {"Content-Type": "application/json"})
         self.assertEqual(response.status_code, 200)
         response_msg = json.loads(response.data.decode("UTF-8"))
-        self.assertEqual(response_msg['1']['Business name'],"Andela") 
+        self.assertEqual(response_msg['Business name'],"Andela") 
 
     def test_business_not_found(self):
         '''Test business not found'''
