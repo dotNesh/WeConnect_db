@@ -267,7 +267,7 @@ def reviews(business_id):
             data = {"title":title, "description":description}
             if validate.inputs(data):
                 return jsonify(validate.inputs(data)), 406
-            user_id = business.owner_id
+            user_id = current_user
             business_id = business.id
             new_review = Reviews(title, description,user_id,business_id)
             new_review.add_review()
