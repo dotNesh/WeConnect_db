@@ -197,7 +197,7 @@ def search():
     businesses = Businesses.search(search, category, location, page, limit)
     if len(businesses) > 0:
         obj = [business.serialize() for business in businesses]
-        ctx = {'Businesses':obj,'Current Page':page}     
+        ctx = {'Businesses':obj,'Current Page':page, 'Previous page':page-1, 'Next page':page+1}     
         return make_response(jsonify(ctx)), 200
     elif len(businesses) == 0 and page == 1:
         return jsonify({'Businesses':{'message': 'No Match found'}}), 404 
