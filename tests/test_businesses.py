@@ -41,7 +41,7 @@ class BusinessTestcase(BaseTestCase):
         self.register_business()
         response = self.app().get("/api/v2/businesses?page=2&limit=2",headers = {"Content-Type": "application/json"})
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg['message'],"Nothing on this page")
 
@@ -153,7 +153,7 @@ class BusinessTestcase(BaseTestCase):
                             headers = {
                                     "Content-Type": "application/json"
                                 })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
         response_msg = json.loads(response.data.decode("UTF-8"))
         self.assertEqual(response_msg["Businesses"]["message"],"Nothing on this page")
 

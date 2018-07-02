@@ -183,7 +183,7 @@ def get_business():
     elif len(businesses) == 0 and page == 1:
         return jsonify({'message': 'No businesses yet'}), 404    
     else:
-        return jsonify({'message': 'Nothing on this page'}), 200
+        return jsonify({'message': 'Nothing on this page'}), 404
 
 @app.route('/api/v2/businesses/search', methods=['GET'])
 def search():
@@ -202,7 +202,7 @@ def search():
     elif len(businesses) == 0 and page == 1:
         return jsonify({'Businesses':{'message': 'No Match found'}}), 404 
     else:
-        return jsonify({'Businesses':{'message': 'Nothing on this page'}}), 200
+        return jsonify({'Businesses':{'message': 'Nothing on this page'}}), 404
 
 
 @app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   
