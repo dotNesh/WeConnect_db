@@ -62,12 +62,11 @@ class Businesses(db.Model):
         self.owner_id = owner_id
 
     def serialize(self):
-        return {self.id:{
+        return {'business_id':self.id,
                 'business_name': self.business_name,
                 'category': self.category,
                 'location': self.location,
-                'description': self.description
-                }
+                'description': self.description       
         }
 
     def register_business(self):
@@ -149,12 +148,12 @@ class Reviews(db.Model):
         self.business_id = business_id
 
     def serialize(self):
-        return {self.id:{
+        return {
+                'id': self.id,
                 'title': self.title,
                 'description': self.description,
                 'Reviewer':self.reviewer.username,
                 'Business':self.business.business_name
-                }
         } 
 
     def add_review(self):

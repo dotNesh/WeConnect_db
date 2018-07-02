@@ -8,6 +8,10 @@ from werkzeug.security import check_password_hash
 from flask_mail import Mail, Message 
 from app import app
 
+
+from flask_cors import CORS
+CORS(app)
+
 #Mail configurations
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -179,7 +183,7 @@ def get_business():
     elif len(businesses) == 0 and page == 1:
         return jsonify({'message': 'No businesses yet'}), 404    
     else:
-        return jsonify({'message': 'Nothing on this page'}), 200
+        return jsonify({'message': 'Nothing on this page'}), 404
 
 @app.route('/api/v2/businesses/search', methods=['GET'])
 def search():
@@ -193,26 +197,27 @@ def search():
     businesses = Businesses.search(search, category, location, page, limit)
     if len(businesses) > 0:
         obj = [business.serialize() for business in businesses]
-        ctx = {'Businesses':obj,'Current Page':page}     
+        ctx = {'Businesses':obj,'Current Page':page, 'Previous page':page-1, 'Next page':page+1}     
         return make_response(jsonify(ctx)), 200
     elif len(businesses) == 0 and page == 1:
-        return jsonify({'message': 'No Match found'}), 404 
+        return jsonify({'Businesses':{'message': 'No Match found'}}), 404 
     else:
-        return jsonify({'message': 'Nothing on this page'}), 200
+        return jsonify({'Businesses':{'message': 'Nothing on this page'}}), 404
 
 
 @app.route('/api/v2/businesses/<int:business_id>', methods=['GET'])   
 def get_a_business(business_id):
         business = Businesses.get_one(business_id)
         if business:
-            results = {business.id:{
+            results = {
+                'Business_id': business.id,
                 'Business name':business.business_name,
                 'Category':business.category,
                 'Location':business.location,
                 'Created By': business.owner.username,
                 'Description':business.description
                 }
-            }       
+                 
             return make_response(jsonify(results)), 200
         else:
             return jsonify({'message':'Resource Not Found'}), 404
@@ -262,7 +267,7 @@ def reviews(business_id):
             data = {"title":title, "description":description}
             if validate.inputs(data):
                 return jsonify(validate.inputs(data)), 406
-            user_id = business.owner_id
+            user_id = current_user
             business_id = business.id
             new_review = Reviews(title, description,user_id,business_id)
             new_review.add_review()
